@@ -1,0 +1,149 @@
+#include "estado.h"
+#include <iostream>
+#include <random>
+#include <algorithm>
+
+Estado::Estado() : cubo(24)
+{
+    resetar();
+}
+
+Estado::Estado(const std::vector<int> &estado_cubo) : cubo(estado_cubo) {}
+
+std::vector<int> Estado::getCubo() const
+{
+    return cubo;
+}
+
+int Estado::getCor(int face, int posicao) const
+{
+    return cubo[face * 4 + posicao];
+}
+
+std::vector<std::string> Estado::getCaminho() const
+{
+    return caminho;
+}
+
+std::vector<std::string> Estado::getMovimentosEmbaralhamento() const
+{
+    return movimentos_embaralhamento;
+}
+
+void Estado::setCubo(const std::vector<int> &novo_cubo)
+{
+    if (novo_cubo.size() == 24)
+    {
+        cubo = novo_cubo;
+    }
+}
+
+void Estado::setCor(int face, int posicao, int cor)
+{
+    cubo[face * 4 + posicao] = cor;
+}
+
+void Estado::adicionarMovimento(const std::string &movimento)
+{
+    caminho.push_back(movimento);
+}
+
+void Estado::adicionarMovimentoEmbaralhamento(const std::string &movimento)
+{
+    movimentos_embaralhamento.push_back(movimento);
+}
+
+bool Estado::operator==(const Estado &outro) const
+{
+    return cubo == outro.cubo;
+}
+
+bool Estado::operator<(const Estado &outro) const
+{
+    return cubo < outro.cubo;
+}
+
+void Estado::resetar()
+{
+    // Estado resolvido: cada lado é preenchido apenas com uma cor
+    // Front = 0, Back = 1, Right = 2, Left = 3, Up = 4, Down = 5
+    for (int face = 0; face < 6; face++)
+    {
+        for (int pos = 0; pos < 4; pos++)
+        {
+            cubo[face * 4 + pos] = face;
+        }
+    }
+    caminho.clear();
+    movimentos_embaralhamento.clear();
+}
+
+void Estado::limparCaminho()
+{
+    caminho.clear();
+}
+
+void Estado::embaralhar(int num_movimentos)
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dis(0, 11);
+
+    // Lista dos movimentos:
+    // R = Right (lado direito) e R' = inverso de R.
+    // O mesmo se aplica para todos os demais movimentos.
+    std::vector<std::string> movimentos = {"R", "R'", "L", "L'", "U", "U'", "D", "D'", "F", "F'", "B", "B'"};
+
+    movimentos_embaralhamento.clear();
+    for (int i = 0; i < num_movimentos; i++)
+    {
+        int mov = dis(gen);
+        adicionarMovimentoEmbaralhamento(movimentos[mov]);
+    }
+}
+
+bool Estado::isResolvido() const
+{
+    for (int face = 0; face < 6; face++)
+    {
+        int primeira_cor = cubo[face * 4];
+        for (int pos = 1; pos < 4; pos++)
+        {
+            if (cubo[face * 4 + pos] != primeira_cor)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+Estado Estado::copiar() const
+{
+    Estado novo_estado(cubo);
+    novo_estado.caminho = caminho;
+    novo_estado.movimentos_embaralhamento = movimentos_embaralhamento;
+    return novo_estado;
+}
+
+void Estado::imprimir() const
+{
+    std::cout << "Estado: ";
+    for (int i = 0; i < 24; i++)
+    {
+        std::cout << cubo[i] << " ";
+        if ((i + 1) % 4 == 0)
+            std::cout << "| ";
+    }
+    std::cout << "\nMovimentos do jogador: ";
+    for (const auto &mov : caminho)
+    {
+        std::cout << mov << " ";
+    }
+    std::cout << "\nMovimentos embaralhamento: ";
+    for (const auto &mov : movimentos_embaralhamento)
+    {
+        std::cout << mov << " ";
+    }
+    std::cout << std::endl;
+}

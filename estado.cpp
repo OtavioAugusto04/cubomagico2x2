@@ -3,12 +3,15 @@
 #include <random>
 #include <algorithm>
 
-Estado::Estado() : cubo(24)
+Estado::Estado() : cubo(24), estados_visitados(0)
 {
     resetar();
 }
 
-Estado::Estado(const std::vector<int> &estado_cubo) : cubo(estado_cubo) {}
+Estado::Estado(const std::vector<int> &estado_cubo) : cubo(estado_cubo), estados_visitados(0) {}
+
+Estado::Estado(const std::vector<int> &estado_cubo, const std::vector<std::string> &caminho_ate_aqui)
+    : cubo(estado_cubo), caminho(caminho_ate_aqui), estados_visitados(0) {}
 
 std::vector<int> Estado::getCubo() const
 {
@@ -28,6 +31,11 @@ std::vector<std::string> Estado::getCaminho() const
 std::vector<std::string> Estado::getMovimentosEmbaralhamento() const
 {
     return movimentos_embaralhamento;
+}
+
+int Estado::getEstadosVisitados() const
+{
+    return estados_visitados;
 }
 
 void Estado::setCubo(const std::vector<int> &novo_cubo)
@@ -53,6 +61,11 @@ void Estado::adicionarMovimentoEmbaralhamento(const std::string &movimento)
     movimentos_embaralhamento.push_back(movimento);
 }
 
+void Estado::setEstadosVisitados(int estados)
+{
+    estados_visitados = estados;
+}
+
 bool Estado::operator==(const Estado &outro) const
 {
     return cubo == outro.cubo;
@@ -65,8 +78,9 @@ bool Estado::operator<(const Estado &outro) const
 
 void Estado::resetar()
 {
-    // Estado resolvido: cada lado é preenchido apenas com uma cor
-    // Front = 0, Back = 1, Right = 2, Left = 3, Up = 4, Down = 5
+    // Lista dos movimentos:
+    // R = Right (lado direito) e R' = inverso de R.
+    // O mesmo se aplica para todos os demais movimentos.
     for (int face = 0; face < 6; face++)
     {
         for (int pos = 0; pos < 4; pos++)
@@ -76,6 +90,7 @@ void Estado::resetar()
     }
     caminho.clear();
     movimentos_embaralhamento.clear();
+    estados_visitados = 0;
 }
 
 void Estado::limparCaminho()
@@ -89,9 +104,6 @@ void Estado::embaralhar(int num_movimentos)
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dis(0, 11);
 
-    // Lista dos movimentos:
-    // R = Right (lado direito) e R' = inverso de R.
-    // O mesmo se aplica para todos os demais movimentos.
     std::vector<std::string> movimentos = {"R", "R'", "L", "L'", "U", "U'", "D", "D'", "F", "F'", "B", "B'"};
 
     movimentos_embaralhamento.clear();
@@ -102,27 +114,11 @@ void Estado::embaralhar(int num_movimentos)
     }
 }
 
-bool Estado::isResolvido() const
-{
-    for (int face = 0; face < 6; face++)
-    {
-        int primeira_cor = cubo[face * 4];
-        for (int pos = 1; pos < 4; pos++)
-        {
-            if (cubo[face * 4 + pos] != primeira_cor)
-            {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
 Estado Estado::copiar() const
 {
-    Estado novo_estado(cubo);
-    novo_estado.caminho = caminho;
+    Estado novo_estado(cubo, caminho);
     novo_estado.movimentos_embaralhamento = movimentos_embaralhamento;
+    novo_estado.estados_visitados = estados_visitados;
     return novo_estado;
 }
 
@@ -145,5 +141,5 @@ void Estado::imprimir() const
     {
         std::cout << mov << " ";
     }
-    std::cout << std::endl;
+    std::cout << "\nEstados visitados: " << estados_visitados << std::endl;
 }

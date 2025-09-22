@@ -2,12 +2,15 @@
 #define JOGO_H
 
 #include "estado.h"
+#include "motor_busca.h"
 #include "interface.h"
+#include <memory>
 
 class Jogo
 {
 private:
     Estado estado_atual;
+    std::unique_ptr<MotorBusca> motor;
     bool rodando;
 
 public:
@@ -16,7 +19,7 @@ public:
 
 private:
     void inicializarJogo();
-    void modoJogo();
+    void modoJogadorHumano();
     void embaralharCubo();
     void resetarCubo();
     void verEmbaralhamento();

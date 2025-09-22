@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -O2
 TARGET = cubo_magico
-SOURCES = main.cpp estado.cpp movimentos.cpp interface.cpp jogo.cpp
+SOURCES = main.cpp estado.cpp funcao_sucessora.cpp funcao_avaliadora.cpp estrutura_dados.cpp interface.cpp motor_busca.cpp jogo.cpp
 
 $(TARGET): $(SOURCES)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SOURCES)

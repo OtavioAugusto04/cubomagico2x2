@@ -2,7 +2,6 @@
 #include <iostream>
 #include <iomanip>
 
-// Para a interface ficar mais bonitinha
 #ifdef _WIN32
 #define CLEAR_COMMAND "cls"
 #else
@@ -84,6 +83,7 @@ void Interface::mostrarCubo(const Estado &estado)
 {
     mostrarCuboDesenrolado(estado.getCubo());
 
+    // Mostrar apenas movimentos do JOGADOR (não embaralhamento)
     auto caminho = estado.getCaminho();
     if (!caminho.empty())
     {
@@ -95,12 +95,20 @@ void Interface::mostrarCubo(const Estado &estado)
         std::cout << "\nTotal de movimentos: " << caminho.size() << std::endl;
     }
 
+    // Estados visitados (só relevante para IAs)
+    if (estado.getEstadosVisitados() > 0)
+    {
+        std::cout << "Estados visitados: " << estado.getEstadosVisitados() << std::endl;
+    }
+
+    // Mostrar se há embaralhamento (opcional)
     auto embaralhamento = estado.getMovimentosEmbaralhamento();
     if (!embaralhamento.empty())
     {
         std::cout << "\n[O cubo foi embaralhado com " << embaralhamento.size() << " movimentos]" << std::endl;
     }
 
+    // Mostrar status atual
     bool tem_movimentos = !caminho.empty() || !embaralhamento.empty();
     if (!tem_movimentos)
     {
@@ -122,7 +130,7 @@ void Interface::mostrarMenu()
 
 void Interface::mostrarComandos()
 {
-    std::cout << "\n=== MOVIMENTOS DISPONIVEIS ===" << std::endl;
+    std::cout << "\n=== TODOS OS MOVIMENTOS DISPONIVEIS ===" << std::endl;
     std::cout << "R  - Rotacionar face DIREITA (sentido horario)" << std::endl;
     std::cout << "R' - Rotacionar face DIREITA (sentido anti-horario)" << std::endl;
     std::cout << "L  - Rotacionar face ESQUERDA (sentido horario)" << std::endl;
@@ -137,7 +145,15 @@ void Interface::mostrarComandos()
     std::cout << "B' - Rotacionar face TRASEIRA (sentido anti-horario)" << std::endl;
     std::cout << "sair - Sair do modo jogo" << std::endl;
     std::cout << "\nCores: W=Branco, Y=Amarelo, R=Vermelho, O=Laranja, G=Verde, B=Azul" << std::endl;
-    std::cout << "\nTotal: 12 movimentos possiveis para todas as faces do cubo" << std::endl;
+    std::cout << "\nTotal: 12 movimentos possiveis (6 faces x 2 direcoes cada)" << std::endl;
+    std::cout << "\n*** EMBARALHAMENTO MANUAL ***" << std::endl;
+    std::cout << "- Pode embaralhar manualmente fazendo movimentos" << std::endl;
+    std::cout << "- Ou usar opcao 2 para embaralhamento automatico" << std::endl;
+    std::cout << "- So mostra 'resolvido' se fez movimentos E chegou ao estado final" << std::endl;
+    std::cout << "\n*** ESTADOS VISITADOS: ***" << std::endl;
+    std::cout << "- No modo jogador: sempre 0 (voce joga manualmente)" << std::endl;
+    std::cout << "- Nas IAs futuras: numero de configuracoes exploradas" << std::endl;
+    std::cout << "- Metrica de eficiencia: quanto menor, melhor o algoritmo" << std::endl;
 }
 
 void Interface::mostrarSolucao(const Estado &estado_final)
@@ -150,6 +166,10 @@ void Interface::mostrarSolucao(const Estado &estado_final)
         std::cout << movimento << " ";
     }
     std::cout << std::endl;
+    if (estado_final.getEstadosVisitados() > 0)
+    {
+        std::cout << "Estados visitados: " << estado_final.getEstadosVisitados() << std::endl;
+    }
 }
 
 void Interface::mostrarEmbaralhamento(const Estado &estado)
@@ -168,7 +188,7 @@ void Interface::mostrarEmbaralhamento(const Estado &estado)
         {
             std::cout << movimento << " ";
         }
-        std::cout << "\n\nPara desfazer, faca os movimentos INVERSOS na ORDEM CONTRARIA:" << std::endl;
+        std::cout << "\n\nPara desfazer o embaralhamento, faca os movimentos INVERSOS na ORDEM CONTRARIA:" << std::endl;
         std::cout << "Inversos: R<->R', L<->L', U<->U', D<->D', F<->F', B<->B'" << std::endl;
     }
 }

@@ -1,7 +1,10 @@
 #include "jogo.h"
-#include "movimentos.h"
+#include "estrutura_dados.h"
+#include "funcao_sucessora.h"
+#include "funcao_avaliadora.h"
 #include <iostream>
 #include <limits>
+#include <memory>
 #include <random>
 
 Jogo::Jogo() : rodando(true)
@@ -12,6 +15,7 @@ Jogo::Jogo() : rodando(true)
 void Jogo::inicializarJogo()
 {
     estado_atual.resetar();
+    motor = std::make_unique<MotorBusca>(std::make_unique<FilaJogador>());
 }
 
 void Jogo::iniciar()
@@ -29,7 +33,7 @@ void Jogo::iniciar()
         switch (opcao)
         {
         case 1:
-            modoJogo();
+            modoJogadorHumano();
             break;
         case 2:
             embaralharCubo();
@@ -62,25 +66,31 @@ void Jogo::iniciar()
     }
 }
 
-void Jogo::modoJogo()
+void Jogo::modoJogadorHumano()
 {
     Interface::limparTela();
     std::cout << "=== MODO JOGO ===" << std::endl;
     std::cout << "12 movimentos disponiveis: R R' L L' U U' D D' F F' B B'" << std::endl;
-    std::cout << "Voce pode embaralhar manualmente ou resolver o cubo!" << std::endl;
+    std::cout << "\nVoce pode embaralhar manualmente ou usar movimentos para resolver!" << std::endl;
     Interface::mostrarComandos();
 
+    // Limpar apenas o caminho do jogador, manter embaralhamento
     estado_atual.limparCaminho();
 
+    // Inicializar motor com estrutura para jogador humano
+    motor = std::make_unique<MotorBusca>(std::make_unique<FilaJogador>());
+
+    // EXECUTAR O LACO PRINCIPAL
     bool continuar = true;
     while (continuar)
     {
         std::cout << std::endl;
         Interface::mostrarCubo(estado_atual);
 
-        bool tem_movimentos = !estado_atual.getCaminho().empty() || !estado_atual.getMovimentosEmbaralhamento().empty();
+        // SÓ VERIFICAR SE ESTÁ RESOLVIDO SE O JOGADOR JÁ FEZ ALGUM MOVIMENTO
+        bool jogador_fez_movimentos = !estado_atual.getCaminho().empty() || !estado_atual.getMovimentosEmbaralhamento().empty();
 
-        if (tem_movimentos && estado_atual.isResolvido())
+        if (jogador_fez_movimentos && FuncaoAvaliadora::ehEstadoFinal(estado_atual))
         {
             Interface::mostrarSolucao(estado_atual);
             std::cout << "\nPressione Enter para voltar ao menu...";
@@ -98,13 +108,13 @@ void Jogo::modoJogo()
         }
         else if (processarMovimento(comando))
         {
+            // Movimento válido processado
             Interface::limparTela();
             std::cout << "=== MODO JOGO ===" << std::endl;
             std::cout << "Movimento aplicado: " << comando << std::endl;
         }
         else
         {
-            std::cout << "=== MODO JOGO ===" << std::endl;
             std::cout << "Movimento invalido! Use: R R' L L' U U' D D' F F' B B'" << std::endl;
         }
     }
@@ -112,13 +122,15 @@ void Jogo::modoJogo()
 
 bool Jogo::processarMovimento(const std::string &comando)
 {
-    std::vector<std::string> movimentos_validos = Movimentos::getTodosMovimentos();
+    // Usar a lista completa de movimentos da Função Sucessora
+    std::vector<std::string> movimentos_validos = FuncaoSucessora::getTodosMovimentos();
 
     for (const auto &mov : movimentos_validos)
     {
         if (comando == mov)
         {
-            estado_atual = Movimentos::aplicarMovimento(estado_atual, comando);
+            // Aplicar movimento usando Função Sucessora
+            estado_atual = FuncaoSucessora::aplicarMovimento(estado_atual, comando);
             return true;
         }
     }
@@ -129,9 +141,11 @@ void Jogo::embaralharCubo()
 {
     std::cout << "\nEmbaralhando o cubo..." << std::endl;
 
+    // Resetar cubo completamente
     estado_atual.resetar();
 
-    std::vector<std::string> todos_movimentos = Movimentos::getTodosMovimentos();
+    // Gerar movimentos de embaralhamento
+    std::vector<std::string> todos_movimentos = FuncaoSucessora::getTodosMovimentos();
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dis(0, todos_movimentos.size() - 1);
@@ -139,6 +153,7 @@ void Jogo::embaralharCubo()
     int num_movimentos = 20;
     std::vector<std::string> movimentos_embaralhamento;
 
+    // Guardar movimentos de embaralhamento ANTES de aplicar
     for (int i = 0; i < num_movimentos; i++)
     {
         std::string movimento = todos_movimentos[dis(gen)];
@@ -146,11 +161,13 @@ void Jogo::embaralharCubo()
         estado_atual.adicionarMovimentoEmbaralhamento(movimento);
     }
 
+    // Aplicar movimentos usando Função Sucessora
     for (const auto &movimento : movimentos_embaralhamento)
     {
-        estado_atual = Movimentos::aplicarMovimento(estado_atual, movimento);
+        estado_atual = FuncaoSucessora::aplicarMovimento(estado_atual, movimento);
     }
 
+    // Limpar apenas o caminho do jogador, preservar embaralhamento
     estado_atual.limparCaminho();
 
     std::cout << "Cubo embaralhado com " << movimentos_embaralhamento.size() << " movimentos aleatorios!" << std::endl;

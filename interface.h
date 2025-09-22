@@ -11,7 +11,7 @@ public:
     static void mostrarMenu();
     static void mostrarComandos();
     static void mostrarSolucao(const Estado &estado_final);
-    static void mostrarEmbaralhamento(const Estado &estado);
+    static void mostrarEmbaralhamento(const Estado &estado); // NOVA FUNÇÃO
     static void limparTela();
     static char corParaChar(int cor);
     static std::string corParaNome(int cor);

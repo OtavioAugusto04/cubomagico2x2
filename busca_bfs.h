@@ -1,27 +1,24 @@
-#ifndef BUSCA_DFS_ITERATIVA_H
-#define BUSCA_DFS_ITERATIVA_H
+#ifndef BUSCA_BFS_H
+#define BUSCA_BFS_H
 
 #include "estado.h"
 #include "motor_busca.h"
 #include "estrutura_dados.h"
 #include <memory>
 
-class BuscaDFSIterativa
+class BuscaBFS
 {
 private:
-    int limite_maximo;
-    int limite_atual;
     int total_estados_visitados;
+    int limite_profundidade;
 
 public:
-    BuscaDFSIterativa(int limite_max = 20);
+    BuscaBFS(int limite_max = 8); // Limite padrao de 8 movimentos
 
     bool buscar(Estado estado_inicial);
     bool buscarComRetorno(Estado estado_inicial, Estado &estado_resolvido);
     int getTotalEstadosVisitados() const;
-
-private:
-    bool buscarComLimite(Estado estado_inicial, int limite);
+    void setLimiteProfundidade(int limite);
 };
 
 #endif

@@ -4,14 +4,14 @@
 #include <vector>
 #include <string>
 
-// Representação do Estado do cubo como vetor explícito
+// Representacao do Estado do cubo como vetor explicito
 class Estado
 {
 private:
-    // Vetor de 24 elementos: 6 faces × 4 posições cada
-    // Índices: [0-3: Front, 4-7: Back, 8-11: Right, 12-15: Left, 16-19: Up, 20-23: Down]
+    // Vetor de 24 elementos: 6 faces x 4 posicoes cada
+    // Indices: [0-3: Front, 4-7: Back, 8-11: Right, 12-15: Left, 16-19: Up, 20-23: Down]
     std::vector<int> cubo;
-    std::vector<std::string> caminho;                   // Sequência de movimentos para chegar neste estado
+    std::vector<std::string> caminho;                   // Sequencia de movimentos para chegar neste estado
     std::vector<std::string> movimentos_embaralhamento; // Movimentos do embaralhamento (separado)
     int estados_visitados;
 
@@ -34,14 +34,14 @@ public:
     void adicionarMovimentoEmbaralhamento(const std::string &movimento);
     void setEstadosVisitados(int estados);
 
-    // Operadores para comparação e estruturas de dados
+    // Operadores para comparacao e estruturas de dados
     bool operator==(const Estado &outro) const;
     bool operator<(const Estado &outro) const;
 
     // Utilidades
     void resetar();
     void embaralhar(int num_movimentos = 15);
-    void limparCaminho(); // Limpa apenas o caminho do jogador, mantém embaralhamento
+    void limparCaminho(); // Limpa apenas o caminho do jogador, mantem embaralhamento
     Estado copiar() const;
 
     // Debug

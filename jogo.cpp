@@ -2,7 +2,8 @@
 #include "estrutura_dados.h"
 #include "funcao_sucessora.h"
 #include "funcao_avaliadora.h"
-#include "busca_dfs_iterativa.h" // NOVO INCLUDE
+#include "busca_dfs_iterativa.h"
+#include "busca_bfs.h" // NOVO INCLUDE
 #include <iostream>
 #include <limits>
 #include <memory>
@@ -24,7 +25,7 @@ void Jogo::iniciar()
     Interface::limparTela();
     std::cout << "Bem-vindo ao Simulador de Cubo Magico 2x2x2!" << std::endl;
     std::cout << "Estado, Funcao Sucessora e Funcao Avaliadora implementados." << std::endl;
-    std::cout << "Agora com IA: Busca em Profundidade Limitada (Iterativa)!" << std::endl;
+    std::cout << "Agora com IA: Busca em Profundidade Limitada (Iterativa) e BFS!" << std::endl;
 
     while (rodando)
     {
@@ -86,6 +87,9 @@ void Jogo::modoIA()
         resolverComDFS();
         break;
     case 2:
+        resolverComBFS();
+        break;
+    case 3:
         // Voltar ao menu principal
         break;
     default:
@@ -101,7 +105,7 @@ void Jogo::resolverComDFS()
 {
     Interface::limparTela();
 
-    // Verificar se já está resolvido
+    // Verificar se ja esta resolvido
     if (FuncaoAvaliadora::ehEstadoFinal(estado_atual))
     {
         std::cout << "O cubo ja esta resolvido!" << std::endl;
@@ -115,15 +119,63 @@ void Jogo::resolverComDFS()
     Interface::mostrarCubo(estado_atual);
 
     // Criar e executar DFS Iterativa
-    BuscaDFSIterativa dfs(15); // Limite máximo de 15 movimentos
+    BuscaDFSIterativa dfs(15); // Limite maximo de 15 movimentos
 
     std::cout << "\nIniciando busca..." << std::endl;
-    bool sucesso = dfs.buscar(estado_atual);
+    Estado estado_resolvido;
+    bool sucesso = dfs.buscarComRetorno(estado_atual, estado_resolvido);
 
-    if (!sucesso)
+    if (sucesso)
+    {
+        // Aplicar a solucao ao estado atual do jogo
+        estado_atual = estado_resolvido;
+        std::cout << "\nCubo resolvido! O estado atual foi atualizado com a solucao." << std::endl;
+    }
+    else
     {
         std::cout << "\nNao foi possivel encontrar solucao com o limite estabelecido." << std::endl;
         std::cout << "Total de estados visitados: " << dfs.getTotalEstadosVisitados() << std::endl;
+    }
+
+    std::cout << "\nPressione Enter para voltar ao menu...";
+    std::cin.ignore();
+    std::cin.get();
+}
+
+void Jogo::resolverComBFS()
+{
+    Interface::limparTela();
+
+    // Verificar se ja esta resolvido
+    if (FuncaoAvaliadora::ehEstadoFinal(estado_atual))
+    {
+        std::cout << "O cubo ja esta resolvido!" << std::endl;
+        std::cout << "Pressione Enter para continuar...";
+        std::cin.ignore();
+        std::cin.get();
+        return;
+    }
+
+    std::cout << "Iniciando Busca em Largura (BFS)..." << std::endl;
+    Interface::mostrarCubo(estado_atual);
+
+    // Criar e executar BFS otimizada (limite de 8 movimentos para evitar crash)
+    BuscaBFS bfs(8);
+
+    std::cout << "\nIniciando busca..." << std::endl;
+    Estado estado_resolvido;
+    bool sucesso = bfs.buscarComRetorno(estado_atual, estado_resolvido);
+
+    if (sucesso)
+    {
+        // Aplicar a solucao ao estado atual do jogo
+        estado_atual = estado_resolvido;
+        std::cout << "\nCubo resolvido! O estado atual foi atualizado com a solucao." << std::endl;
+    }
+    else
+    {
+        std::cout << "\nNao foi possivel encontrar solucao com BFS." << std::endl;
+        std::cout << "Total de estados visitados: " << bfs.getTotalEstadosVisitados() << std::endl;
     }
 
     std::cout << "\nPressione Enter para voltar ao menu...";
@@ -153,7 +205,7 @@ void Jogo::modoJogadorHumano()
         std::cout << std::endl;
         Interface::mostrarCubo(estado_atual);
 
-        // SÓ VERIFICAR SE ESTÁ RESOLVIDO SE O JOGADOR JÁ FEZ ALGUM MOVIMENTO
+        // SO VERIFICAR SE ESTA RESOLVIDO SE O JOGADOR JA FEZ ALGUM MOVIMENTO
         bool jogador_fez_movimentos = !estado_atual.getCaminho().empty() || !estado_atual.getMovimentosEmbaralhamento().empty();
 
         if (jogador_fez_movimentos && FuncaoAvaliadora::ehEstadoFinal(estado_atual))

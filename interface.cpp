@@ -71,7 +71,7 @@ void Interface::mostrarCuboDesenrolado(const std::vector<int> &cubo)
     std::cout << "    |" << corParaChar(cubo[22]) << " " << corParaChar(cubo[23]) << "|BAIXO" << std::endl;
     std::cout << "    +---+    " << std::endl;
     std::cout << "    +---+    " << std::endl;
-    std::cout << "    |" << corParaChar(cubo[4]) << " " << corParaChar(cubo[5]) << "|TRÁS" << std::endl;
+    std::cout << "    |" << corParaChar(cubo[4]) << " " << corParaChar(cubo[5]) << "|TRAS" << std::endl;
     std::cout << "    +---+    " << std::endl;
     std::cout << "    |" << corParaChar(cubo[6]) << " " << corParaChar(cubo[7]) << "|    " << std::endl;
     std::cout << "    +---+    " << std::endl;
@@ -83,7 +83,7 @@ void Interface::mostrarCubo(const Estado &estado)
 {
     mostrarCuboDesenrolado(estado.getCubo());
 
-    // Mostrar apenas movimentos do JOGADOR (não embaralhamento)
+    // Mostrar apenas movimentos do JOGADOR (nao embaralhamento)
     auto caminho = estado.getCaminho();
     if (!caminho.empty())
     {
@@ -95,13 +95,13 @@ void Interface::mostrarCubo(const Estado &estado)
         std::cout << "\nTotal de movimentos: " << caminho.size() << std::endl;
     }
 
-    // Estados visitados (só relevante para IAs)
+    // Estados visitados (so relevante para IAs)
     if (estado.getEstadosVisitados() > 0)
     {
         std::cout << "Estados visitados: " << estado.getEstadosVisitados() << std::endl;
     }
 
-    // Mostrar se há embaralhamento (opcional)
+    // Mostrar se ha embaralhamento (opcional)
     auto embaralhamento = estado.getMovimentosEmbaralhamento();
     if (!embaralhamento.empty())
     {
@@ -133,7 +133,8 @@ void Interface::mostrarMenuIA()
 {
     std::cout << "\n=== RESOLVER COM IA ===" << std::endl;
     std::cout << "1. Busca em Profundidade Limitada (Iterativa)" << std::endl;
-    std::cout << "2. Voltar ao menu principal" << std::endl;
+    std::cout << "2. Busca em Largura (BFS)" << std::endl;
+    std::cout << "3. Voltar ao menu principal" << std::endl;
     std::cout << "Escolha o algoritmo: ";
 }
 
@@ -165,8 +166,12 @@ void Interface::mostrarComandos()
     std::cout << "- Metrica de eficiencia: quanto menor, melhor o algoritmo" << std::endl;
     std::cout << "\n*** IA DISPONIVEL: ***" << std::endl;
     std::cout << "- Busca em Profundidade Limitada (Iterativa)" << std::endl;
-    std::cout << "- Tenta profundidades 0, 1, 2, 3... ate encontrar solucao" << std::endl;
-    std::cout << "- Usa pilha (DFS) com limite de profundidade crescente" << std::endl;
+    std::cout << "  * Tenta profundidades 0, 1, 2, 3... ate encontrar solucao" << std::endl;
+    std::cout << "  * Usa pilha (DFS) com limite de profundidade crescente" << std::endl;
+    std::cout << "- Busca em Largura (BFS) OTIMIZADA" << std::endl;
+    std::cout << "  * Explora estados por niveis de profundidade" << std::endl;
+    std::cout << "  * Usa fila (FIFO) para garantir solucao otima" << std::endl;
+    std::cout << "  * LIMITE DE 8 MOVIMENTOS para evitar crash de memoria" << std::endl;
 }
 
 void Interface::mostrarSolucao(const Estado &estado_final)
@@ -176,12 +181,12 @@ void Interface::mostrarSolucao(const Estado &estado_final)
 
     if (estado_final.getEstadosVisitados() > 0)
     {
-        // Solução por IA
+        // Solucao por IA
         std::cout << "IA encontrou solucao com " << caminho.size() << " movimentos:" << std::endl;
     }
     else
     {
-        // Solução manual
+        // Solucao manual
         std::cout << "Parabens! Voce resolveu com " << caminho.size() << " movimentos:" << std::endl;
     }
 

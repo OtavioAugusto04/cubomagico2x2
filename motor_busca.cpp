@@ -13,17 +13,17 @@ bool MotorBusca::executarBusca(Estado estado_inicial)
     // 1. Adicionar estado na estrutura
     estrutura->adicionar(estado_inicial);
 
-    // 2. Enquanto a estrutura não estiver vazia:
+    // 2. Enquanto a estrutura nao estiver vazia:
     while (!estrutura->vazia())
     {
 
-        // 3. Remover próximo estado da estrutura
+        // 3. Remover proximo estado da estrutura
         Estado estado_atual = estrutura->remover();
         contador_estados++;
         estado_atual.setEstadosVisitados(contador_estados);
 
         // 4. Avaliar estado
-        // 5. SE estado final -> mostrar solução e encerrar o programa
+        // 5. SE estado final -> mostrar solucao e encerrar o programa
         if (FuncaoAvaliadora::ehEstadoFinal(estado_atual))
         {
             Interface::mostrarSolucao(estado_atual);
@@ -34,8 +34,8 @@ bool MotorBusca::executarBusca(Estado estado_inicial)
         adicionarEstadosSegintes(estado_atual);
     }
 
-    // 7. Retornar "Sem solução"
-    std::cout << "Sem solução encontrada!" << std::endl;
+    // 7. Retornar "Sem solucao"
+    std::cout << "Sem solucao encontrada!" << std::endl;
     return false;
 }
 
@@ -46,6 +46,40 @@ void MotorBusca::adicionarEstadosSegintes(const Estado &estado_atual)
     {
         estrutura->adicionar(sucessor);
     }
+}
+
+bool MotorBusca::executarBuscaComRetorno(Estado estado_inicial, Estado &estado_resolvido)
+{
+    contador_estados = 0;
+    estrutura->limpar();
+
+    // 1. Adicionar estado na estrutura
+    estrutura->adicionar(estado_inicial);
+
+    // 2. Enquanto a estrutura nao estiver vazia:
+    while (!estrutura->vazia())
+    {
+        // 3. Remover proximo estado da estrutura
+        Estado estado_atual = estrutura->remover();
+        contador_estados++;
+        estado_atual.setEstadosVisitados(contador_estados);
+
+        // 4. Avaliar estado
+        // 5. SE estado final -> retornar estado resolvido
+        if (FuncaoAvaliadora::ehEstadoFinal(estado_atual))
+        {
+            estado_resolvido = estado_atual;
+            Interface::mostrarSolucao(estado_atual);
+            return true;
+        }
+
+        // 6. Adicionar estados seguintes na estrutura
+        adicionarEstadosSegintes(estado_atual);
+    }
+
+    // 7. Retornar "Sem solucao"
+    std::cout << "Sem solucao encontrada!" << std::endl;
+    return false;
 }
 
 int MotorBusca::getContadorEstados() const

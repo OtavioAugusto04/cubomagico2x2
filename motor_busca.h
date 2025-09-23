@@ -17,6 +17,7 @@ public:
     MotorBusca(std::unique_ptr<EstruturaAbstrata> estrutura_dados);
 
     bool executarBusca(Estado estado_inicial);
+    bool executarBuscaComRetorno(Estado estado_inicial, Estado &estado_resolvido);
 
     int getContadorEstados() const;
 

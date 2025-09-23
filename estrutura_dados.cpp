@@ -61,12 +61,58 @@ void FilaBFS::limpar()
     }
 }
 
+// FilaBFSLimitada
+FilaBFSLimitada::FilaBFSLimitada(int limite) : limite_profundidade(limite) {}
+
+void FilaBFSLimitada::adicionar(const Estado &estado)
+{
+    // So adiciona se nao exceder o limite de profundidade
+    if (static_cast<int>(estado.getCaminho().size()) <= limite_profundidade)
+    {
+        fila.push(estado);
+    }
+}
+
+Estado FilaBFSLimitada::remover()
+{
+    if (fila.empty())
+    {
+        throw std::runtime_error("Estrutura vazia");
+    }
+    Estado estado = fila.front();
+    fila.pop();
+    return estado;
+}
+
+bool FilaBFSLimitada::vazia() const
+{
+    return fila.empty();
+}
+
+void FilaBFSLimitada::limpar()
+{
+    while (!fila.empty())
+    {
+        fila.pop();
+    }
+}
+
+void FilaBFSLimitada::setLimite(int novo_limite)
+{
+    limite_profundidade = novo_limite;
+}
+
+int FilaBFSLimitada::getLimite() const
+{
+    return limite_profundidade;
+}
+
 // PilhaDFS
 PilhaDFS::PilhaDFS(int limite) : limite_profundidade(limite) {}
 
 void PilhaDFS::adicionar(const Estado &estado)
 {
-    // Só adiciona se não exceder o limite de profundidade
+    // So adiciona se nao exceder o limite de profundidade
     if (static_cast<int>(estado.getCaminho().size()) <= limite_profundidade)
     {
         pilha.push(estado);

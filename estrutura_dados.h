@@ -29,7 +29,7 @@ public:
     void limpar() override;
 };
 
-// Para futuras implementações de IA
+// Para Busca em Largura
 class FilaBFS : public EstruturaAbstrata
 {
 private:
@@ -40,6 +40,23 @@ public:
     Estado remover() override;
     bool vazia() const override;
     void limpar() override;
+};
+
+// Para Busca em Profundidade com Controle de Limite
+class PilhaDFS : public EstruturaAbstrata
+{
+private:
+    std::stack<Estado> pilha;
+    int limite_profundidade;
+
+public:
+    PilhaDFS(int limite);
+    void adicionar(const Estado &estado) override;
+    Estado remover() override;
+    bool vazia() const override;
+    void limpar() override;
+    void setLimite(int novo_limite);
+    int getLimite() const;
 };
 
 #endif

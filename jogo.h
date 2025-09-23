@@ -4,6 +4,7 @@
 #include "estado.h"
 #include "motor_busca.h"
 #include "interface.h"
+#include "busca_dfs_iterativa.h" // NOVO INCLUDE
 #include <memory>
 
 class Jogo
@@ -20,6 +21,8 @@ public:
 private:
     void inicializarJogo();
     void modoJogadorHumano();
+    void modoIA();
+    void resolverComDFS();
     void embaralharCubo();
     void resetarCubo();
     void verEmbaralhamento();

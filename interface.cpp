@@ -119,13 +119,22 @@ void Interface::mostrarCubo(const Estado &estado)
 void Interface::mostrarMenu()
 {
     std::cout << "\n=== SIMULADOR CUBO MAGICO 2x2x2 ===" << std::endl;
-    std::cout << "1. Jogar" << std::endl;
+    std::cout << "1. Jogar (modo humano)" << std::endl;
     std::cout << "2. Embaralhar cubo automaticamente" << std::endl;
-    std::cout << "3. Resetar cubo" << std::endl;
-    std::cout << "4. Mostrar comandos" << std::endl;
-    std::cout << "5. Ver movimentos de embaralhamento" << std::endl;
-    std::cout << "6. Sair" << std::endl;
+    std::cout << "3. Resolver com IA" << std::endl;
+    std::cout << "4. Resetar cubo" << std::endl;
+    std::cout << "5. Mostrar comandos" << std::endl;
+    std::cout << "6. Ver movimentos de embaralhamento" << std::endl;
+    std::cout << "7. Sair" << std::endl;
     std::cout << "Escolha uma opcao: ";
+}
+
+void Interface::mostrarMenuIA()
+{
+    std::cout << "\n=== RESOLVER COM IA ===" << std::endl;
+    std::cout << "1. Busca em Profundidade Limitada (Iterativa)" << std::endl;
+    std::cout << "2. Voltar ao menu principal" << std::endl;
+    std::cout << "Escolha o algoritmo: ";
 }
 
 void Interface::mostrarComandos()
@@ -152,23 +161,39 @@ void Interface::mostrarComandos()
     std::cout << "- So mostra 'resolvido' se fez movimentos E chegou ao estado final" << std::endl;
     std::cout << "\n*** ESTADOS VISITADOS: ***" << std::endl;
     std::cout << "- No modo jogador: sempre 0 (voce joga manualmente)" << std::endl;
-    std::cout << "- Nas IAs futuras: numero de configuracoes exploradas" << std::endl;
+    std::cout << "- Nas IAs: numero de configuracoes exploradas pelo algoritmo" << std::endl;
     std::cout << "- Metrica de eficiencia: quanto menor, melhor o algoritmo" << std::endl;
+    std::cout << "\n*** IA DISPONIVEL: ***" << std::endl;
+    std::cout << "- Busca em Profundidade Limitada (Iterativa)" << std::endl;
+    std::cout << "- Tenta profundidades 0, 1, 2, 3... ate encontrar solucao" << std::endl;
+    std::cout << "- Usa pilha (DFS) com limite de profundidade crescente" << std::endl;
 }
 
 void Interface::mostrarSolucao(const Estado &estado_final)
 {
-    std::cout << "\n----- CUBO RESOLVIDO! -----" << std::endl;
+    std::cout << "\n*** CUBO RESOLVIDO! ***" << std::endl;
     auto caminho = estado_final.getCaminho();
-    std::cout << "Voce resolveu com " << caminho.size() << " movimentos:" << std::endl;
+
+    if (estado_final.getEstadosVisitados() > 0)
+    {
+        // Solução por IA
+        std::cout << "IA encontrou solucao com " << caminho.size() << " movimentos:" << std::endl;
+    }
+    else
+    {
+        // Solução manual
+        std::cout << "Parabens! Voce resolveu com " << caminho.size() << " movimentos:" << std::endl;
+    }
+
     for (const auto &movimento : caminho)
     {
         std::cout << movimento << " ";
     }
     std::cout << std::endl;
+
     if (estado_final.getEstadosVisitados() > 0)
     {
-        std::cout << "Estados visitados: " << estado_final.getEstadosVisitados() << std::endl;
+        std::cout << "Estados visitados pela IA: " << estado_final.getEstadosVisitados() << std::endl;
     }
 }
 
@@ -190,5 +215,6 @@ void Interface::mostrarEmbaralhamento(const Estado &estado)
         }
         std::cout << "\n\nPara desfazer o embaralhamento, faca os movimentos INVERSOS na ORDEM CONTRARIA:" << std::endl;
         std::cout << "Inversos: R<->R', L<->L', U<->U', D<->D', F<->F', B<->B'" << std::endl;
+        std::cout << "\nOu use a opcao 3 para resolver automaticamente com IA!" << std::endl;
     }
 }

@@ -2,6 +2,7 @@
 #include "estrutura_dados.h"
 #include "funcao_sucessora.h"
 #include "funcao_avaliadora.h"
+#include "busca_dfs_iterativa.h" // NOVO INCLUDE
 #include <iostream>
 #include <limits>
 #include <memory>
@@ -22,6 +23,8 @@ void Jogo::iniciar()
 {
     Interface::limparTela();
     std::cout << "Bem-vindo ao Simulador de Cubo Magico 2x2x2!" << std::endl;
+    std::cout << "Estado, Funcao Sucessora e Funcao Avaliadora implementados." << std::endl;
+    std::cout << "Agora com IA: Busca em Profundidade Limitada (Iterativa)!" << std::endl;
 
     while (rodando)
     {
@@ -39,15 +42,18 @@ void Jogo::iniciar()
             embaralharCubo();
             break;
         case 3:
-            resetarCubo();
+            modoIA();
             break;
         case 4:
-            mostrarAjuda();
+            resetarCubo();
             break;
         case 5:
-            verEmbaralhamento();
+            mostrarAjuda();
             break;
         case 6:
+            verEmbaralhamento();
+            break;
+        case 7:
             rodando = false;
             std::cout << "Obrigado por jogar!" << std::endl;
             break;
@@ -66,12 +72,72 @@ void Jogo::iniciar()
     }
 }
 
+void Jogo::modoIA()
+{
+    Interface::limparTela();
+    Interface::mostrarCubo(estado_atual);
+    Interface::mostrarMenuIA();
+
+    int opcao = lerOpcao();
+
+    switch (opcao)
+    {
+    case 1:
+        resolverComDFS();
+        break;
+    case 2:
+        // Voltar ao menu principal
+        break;
+    default:
+        std::cout << "Opcao invalida!" << std::endl;
+        std::cout << "Pressione Enter para continuar...";
+        std::cin.ignore();
+        std::cin.get();
+        break;
+    }
+}
+
+void Jogo::resolverComDFS()
+{
+    Interface::limparTela();
+
+    // Verificar se já está resolvido
+    if (FuncaoAvaliadora::ehEstadoFinal(estado_atual))
+    {
+        std::cout << "O cubo ja esta resolvido!" << std::endl;
+        std::cout << "Pressione Enter para continuar...";
+        std::cin.ignore();
+        std::cin.get();
+        return;
+    }
+
+    std::cout << "Iniciando Busca em Profundidade Limitada (Iterativa)..." << std::endl;
+    Interface::mostrarCubo(estado_atual);
+
+    // Criar e executar DFS Iterativa
+    BuscaDFSIterativa dfs(15); // Limite máximo de 15 movimentos
+
+    std::cout << "\nIniciando busca..." << std::endl;
+    bool sucesso = dfs.buscar(estado_atual);
+
+    if (!sucesso)
+    {
+        std::cout << "\nNao foi possivel encontrar solucao com o limite estabelecido." << std::endl;
+        std::cout << "Total de estados visitados: " << dfs.getTotalEstadosVisitados() << std::endl;
+    }
+
+    std::cout << "\nPressione Enter para voltar ao menu...";
+    std::cin.ignore();
+    std::cin.get();
+}
+
 void Jogo::modoJogadorHumano()
 {
     Interface::limparTela();
-    std::cout << "=== MODO JOGO ===" << std::endl;
+    std::cout << "=== MODO JOGADOR HUMANO ===" << std::endl;
+    std::cout << "Usando o LACO PRINCIPAL especificado no projeto." << std::endl;
     std::cout << "12 movimentos disponiveis: R R' L L' U U' D D' F F' B B'" << std::endl;
-    std::cout << "\nVoce pode embaralhar manualmente ou usar movimentos para resolver!" << std::endl;
+    std::cout << "\nVoce pode embaralhar manualmente ou resolver o cubo!" << std::endl;
     Interface::mostrarComandos();
 
     // Limpar apenas o caminho do jogador, manter embaralhamento
@@ -108,9 +174,8 @@ void Jogo::modoJogadorHumano()
         }
         else if (processarMovimento(comando))
         {
-            // Movimento válido processado
             Interface::limparTela();
-            std::cout << "=== MODO JOGO ===" << std::endl;
+            std::cout << "=== MODO JOGADOR HUMANO ===" << std::endl;
             std::cout << "Movimento aplicado: " << comando << std::endl;
         }
         else
@@ -122,14 +187,12 @@ void Jogo::modoJogadorHumano()
 
 bool Jogo::processarMovimento(const std::string &comando)
 {
-    // Usar a lista completa de movimentos da Função Sucessora
     std::vector<std::string> movimentos_validos = FuncaoSucessora::getTodosMovimentos();
 
     for (const auto &mov : movimentos_validos)
     {
         if (comando == mov)
         {
-            // Aplicar movimento usando Função Sucessora
             estado_atual = FuncaoSucessora::aplicarMovimento(estado_atual, comando);
             return true;
         }
@@ -141,19 +204,16 @@ void Jogo::embaralharCubo()
 {
     std::cout << "\nEmbaralhando o cubo..." << std::endl;
 
-    // Resetar cubo completamente
     estado_atual.resetar();
 
-    // Gerar movimentos de embaralhamento
     std::vector<std::string> todos_movimentos = FuncaoSucessora::getTodosMovimentos();
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dis(0, todos_movimentos.size() - 1);
 
-    int num_movimentos = 20;
+    int num_movimentos = 8;
     std::vector<std::string> movimentos_embaralhamento;
 
-    // Guardar movimentos de embaralhamento ANTES de aplicar
     for (int i = 0; i < num_movimentos; i++)
     {
         std::string movimento = todos_movimentos[dis(gen)];
@@ -161,17 +221,16 @@ void Jogo::embaralharCubo()
         estado_atual.adicionarMovimentoEmbaralhamento(movimento);
     }
 
-    // Aplicar movimentos usando Função Sucessora
     for (const auto &movimento : movimentos_embaralhamento)
     {
         estado_atual = FuncaoSucessora::aplicarMovimento(estado_atual, movimento);
     }
 
-    // Limpar apenas o caminho do jogador, preservar embaralhamento
     estado_atual.limparCaminho();
 
     std::cout << "Cubo embaralhado com " << movimentos_embaralhamento.size() << " movimentos aleatorios!" << std::endl;
-    std::cout << "Use a opcao 5 do menu se quiser ver quais foram os movimentos." << std::endl;
+    std::cout << "Use a opcao 6 se quiser ver quais foram os movimentos." << std::endl;
+    std::cout << "Agora pode usar a opcao 3 para resolver com IA!" << std::endl;
     std::cout << "Pressione Enter para continuar...";
     std::cin.ignore();
     std::cin.get();
@@ -204,6 +263,7 @@ void Jogo::mostrarAjuda()
     std::cout << "> 12 movimentos completos para todas as faces" << std::endl;
     std::cout << "> Embaralhamento automatico e manual" << std::endl;
     std::cout << "> Deteccao automatica de cubo resolvido" << std::endl;
+    std::cout << "> IA: Busca em Profundidade Limitada (Iterativa)" << std::endl;
     std::cout << "\nPressione Enter para continuar...";
     std::cin.ignore();
     std::cin.get();

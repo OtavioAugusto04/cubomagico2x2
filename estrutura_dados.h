@@ -16,7 +16,7 @@ public:
     virtual void limpar() = 0;
 };
 
-// Implementação para modo jogador (fila simples)
+// Implementacao para modo jogador (fila simples)
 class FilaJogador : public EstruturaAbstrata
 {
 private:
@@ -40,6 +40,23 @@ public:
     Estado remover() override;
     bool vazia() const override;
     void limpar() override;
+};
+
+// Para Busca em Largura com Limite de Profundidade
+class FilaBFSLimitada : public EstruturaAbstrata
+{
+private:
+    std::queue<Estado> fila;
+    int limite_profundidade;
+
+public:
+    FilaBFSLimitada(int limite);
+    void adicionar(const Estado &estado) override;
+    Estado remover() override;
+    bool vazia() const override;
+    void limpar() override;
+    void setLimite(int novo_limite);
+    int getLimite() const;
 };
 
 // Para Busca em Profundidade com Controle de Limite

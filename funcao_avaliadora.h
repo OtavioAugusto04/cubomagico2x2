@@ -3,7 +3,7 @@
 
 #include "estado.h"
 
-// Função Avaliadora - determina se um estado é final (resolvido)
+// Funcao Avaliadora - determina se um estado e final (resolvido)
 class FuncaoAvaliadora
 {
 public:

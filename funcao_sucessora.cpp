@@ -71,7 +71,7 @@ Estado FuncaoSucessora::aplicarMovimento(const Estado &estado, const std::string
         novo_cubo = movimentoBi(novo_cubo);
     }
 
-    // PRESERVAR TODAS AS INFORMAÇÕES DO ESTADO ANTERIOR
+    // PRESERVAR TODAS AS INFORMACOES DO ESTADO ANTERIOR
     Estado novo_estado = estado.copiar(); // Usar copiar() em vez de construtor
     novo_estado.setCubo(novo_cubo);
     novo_estado.adicionarMovimento(movimento);

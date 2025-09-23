@@ -4,7 +4,7 @@
 #include "estado.h"
 #include <vector>
 
-// Função Sucessora - gera todos os estados possíveis a partir de um estado
+// Funcao Sucessora - gera todos os estados possiveis a partir de um estado
 class FuncaoSucessora
 {
 public:

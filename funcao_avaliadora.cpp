@@ -4,7 +4,7 @@ bool FuncaoAvaliadora::ehEstadoFinal(const Estado &estado)
 {
     std::vector<int> cubo = estado.getCubo();
 
-    // Verifica se todas as 6 faces estão resolvidas
+    // Verifica se todas as 6 faces estao resolvidas
     for (int face = 0; face < 6; face++)
     {
         if (!faceResolvida(cubo, face))
@@ -30,7 +30,7 @@ bool FuncaoAvaliadora::faceResolvida(const std::vector<int> &cubo, int face)
 
 int FuncaoAvaliadora::calcularHeuristica(const Estado &estado)
 {
-    // Implementação futura para A*
+    // Implementacao futura para A*
     std::vector<int> cubo = estado.getCubo();
     int pecas_fora_lugar = 0;
 
